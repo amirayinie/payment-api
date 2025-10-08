@@ -8,43 +8,48 @@ use Illuminate\Database\Eloquent\Model;
 class Transaction extends Model
 {
 
-   protected $fillable = [
-    'from_card_id',
-    'to_card_id',
-    'amount_toman',
-    'status',
-    'refrence',
-    'performed_at'
-   ];
+    protected $fillable = [
+        'from_card_id',
+        'to_card_id',
+        'amount_toman',
+        'status',
+        'refrence',
+        'performed_at'
+    ];
 
-   public const STATUS_INITIATED = 'initiated';
-   Public const STATUS_SUCCEEDED = 'succeeded';
-   public const STATUS_FAILED    =  'failed';
+    public const STATUS_INITIATED = 'initiated';
+    public const STATUS_SUCCEEDED = 'succeeded';
+    public const STATUS_FAILED    =  'failed';
 
 
     public function fromCreditCard()
     {
-        return $this->belongsTo(CreditCard::class,'from_card_id');
+        return $this->belongsTo(CreditCard::class, 'from_card_id');
     }
 
     public function toCreditCard()
     {
-        return $this->belongsTo(CreditCard::class,'to_card_id');
+        return $this->belongsTo(CreditCard::class, 'to_card_id');
+    }
+
+    public function transactionFee()
+    {
+        return $this->hasOne(transactionFee::class);
     }
 
     //scopes
-    
-    public function scopeSucceeded(Builder $q ) :Builder
+
+    public function scopeSucceeded(Builder $q): Builder
     {
-        return $q->where('status' , 'Succeeded');
+        return $q->where('status', 'Succeeded');
     }
 
-    public function scopeInWindowsMinute(Builder $q , int $minutes) :Builder
+    public function scopeInWindowsMinute(Builder $q, int $minutes): Builder
     {
-        return $q->where('performed_at' , '>=' , now()->subMinutes($minutes));
+        return $q->where('performed_at', '>=', now()->subMinutes($minutes));
     }
 
-    
+
     public function scopeTopUsersByWindowMinutes(Builder $q, int $minutes, int $limit = 3): Builder
     {
         return $q->selectRaw('users.id as user_id, users.name, count(transactions.id) as tx_count')
