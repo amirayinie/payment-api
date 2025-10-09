@@ -1,61 +1,116 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## 🏦 Laravel Banking API – Modular Transfer & SMS System
 
-## About Laravel
+### 📋 Overview
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+This project is a **modular banking API** built with **Laravel 12**, designed to simulate internal bank transfers between credit cards and demonstrate clean architecture, service-based design, and extendable communication modules (e.g., SMS & Payment Gateways).
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### ⚙️ Features
 
-## Learning Laravel
+* 💳 **Card-to-card transfer system**
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+  * Validates Iranian card numbers (BIN + Luhn)
+  * Supports Persian/Arabic/English digits
+  * Atomic DB transactions with `lockForUpdate`
+  * Fixed transaction fee handling (₮500)
+* 🧾 **Transaction & Fee Logging**
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+  * Independent tables for `transactions` and `transaction_fees`
+  * Reference tracking and timestamps
+* 📲 **SMS Notification System**
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+  * Modular architecture (Strategy + Factory Pattern)
+  * Implemented with **Kavenegar** provider
+  * Ready for future expansion (e.g., Ghasedak)
+* 📊 **Analytics API**
 
-## Laravel Sponsors
+  * Returns top 3 users with the most transactions in the last 10 minutes
+  * Includes last 10 transactions for each user
+* 🧱 **Clean Service Architecture**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+  * `TransferService`, `SmsService`, and `PaymentService` (future feature)
+  * Fully RESTful endpoints
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 🗂️ Main Endpoints
 
-## Contributing
+| Method | Endpoint                   | Description                                           |
+| ------ | -------------------------- | ----------------------------------------------------- |
+| `POST` | `/api/transfers`           | Perform card-to-card transfer                         |
+| `GET`  | `/api/analytics/top-users` | Get top 3 users with most transactions in last 10 min |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+### 🧩 Folder Structure
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+app/
+ ├── Http/
+ │    ├── Controllers/
+ │    │    ├── TransferController.php
+ │    │    └── AnalyticsController.php
+ │    └── Requests/TransferRequest.php
+ ├── Models/
+ ├── Services/
+ │    ├── TransferService.php
+ │    └── Sms/
+ │         ├── SmsService.php
+ │         ├── Contracts/SmsProviderInterface.php
+ │         ├── Providers/KavenegarProvider.php
+ │         └── SmsProviderFactory.php
+ ├── Helpers/helpers.php
+ └── ...
+```
 
-## Security Vulnerabilities
+---
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 🧰 Configuration
 
-## License
+Create `.env` and set:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+KAVEHNEGAR_API_KEY=your_api_key
+KAVEHNEGAR_SENDER=10004346
+SMS_PROVIDER=kavenegar
+
+For the payment gateways (future feature):
+
+PAYMENT_GATEWAY=fake
+ZARINPAL_MERCHANT_ID=your_id
+
+---
+
+### 🚀 Run Locally
+
+
+composer install
+php artisan migrate --seed
+php artisan serve
+
+
+**Test transfer API:**
+
+POST /api/transfer
+{
+  "from_card": "6274123412341234",
+  "to_card": "5022290112345678",
+  "amount": "50000"
+}
+
+
+---
+
+### 🧠 Future Expansion
+
+* Add `GhasedakProvider` to `Sms/Providers`
+* Integrate sandbox payment gateways (Zarinpal, IdPay)
+* Add queue-based SMS dispatch
+
+---
+
+### 🧑‍💻 Author : [Amirhosein Ayinie] Laravel Developer & Backend Engineer 📧 [ayinie2003@gmail.com] 🔗 LinkedIn | GitHub
+Developed as a **training project** to demonstrate clean Laravel architecture, modular service layers, and extendable design patterns by amirhosein ayinie.
+
+---
