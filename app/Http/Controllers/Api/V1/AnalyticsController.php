@@ -38,7 +38,7 @@ class AnalyticsController extends Controller
                     'amount'       => $t->amount_toman,
                     'from_card'    => '****' . substr($t->fromCreditCard->card_number, -4),
                     'to_card'      => '****' . substr($t->toCreditCard->card_number, -4),
-                    'performed_at' => $t->performed_at->toDateTimeString(),
+                    'performed_at' => $t->performed_at,
                 ]);
 
             return [
