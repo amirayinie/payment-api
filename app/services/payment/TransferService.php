@@ -11,8 +11,6 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
-use function App\utilities\json;
-
 class TransferService
 {
     protected  int $feeAmount = 500;

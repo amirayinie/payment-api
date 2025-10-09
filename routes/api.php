@@ -12,6 +12,6 @@ Route::get('/user', function (Request $request) {
 Route::prefix('v1')->group(function (){
 
 Route::post('transfer',[TransferController::class,'transfer']);
-Route::get('transfers/top-users',[AnalyticsController::class],'topUsers');
+Route::get('transfers/top-users',[AnalyticsController::class,'topUsers']);
 
 });
